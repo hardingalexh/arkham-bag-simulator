@@ -1,3 +1,4 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 COPY ./app /app
-RUN pip install -r /app/requirements.txt
+COPY ./requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
