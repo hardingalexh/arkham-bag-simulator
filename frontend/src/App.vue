@@ -357,9 +357,20 @@ export default {
         fetch('http://localhost:8000/simulate/', {
           method: 'post',
           body: JSON.stringify({bag: this.bag, cards: this.cards, character: this.characters[this.characterIdx]})
-        }).then(function(response){
-          this.successProbabilities = Object.values(response.test_results)
-          this.iterations = response.iterations
+        })
+        .then((r) => r.json())
+        .then(function(d){
+          //eslint-disable-next-line
+          console.log(d)
+
+          this.successProbabilities = Object.keys(d.test_results)
+          .sort((a,b) => parseInt(a) - parseInt(b))
+          .map(k => d.test_results[k])
+          this.iterations = d.iterations
+        }.bind(this))
+        .catch(e => {
+          // eslint-disable-next-line
+          console.error(e)
         })
     },
     probabilitiesOfToken() {
