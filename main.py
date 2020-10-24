@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from joblib import Parallel, delayed
+
 from simulation import resolveToken
 from analysis import analyzeResults
 
@@ -53,10 +55,13 @@ async def root():
 @app.post("/simulate/")
 async def create_simulation(bag: List[Token], cards: cards, character: Optional[Character]):
     results = []
-    for token in bag:
-        print("drawing token: " + token.label)
-        token_results = resolveToken(token, bag, cards, character)
-        results += token_results
-    test_results = analyzeResults(results)
-    json_test_results = jsonable_encoder(test_results)
-    return JSONResponse(content=json_test_results)
+    results = Parallel(n_jobs=6)(delayed(resolveToken)(token, bag, cards, character) for token in bag)
+    flattened_results = [result for token_result in results for result in token_result]
+
+    test_results = analyzeResults(flattened_results)
+    output = {
+        'iterations': len(flattened_results),
+        'test_results': test_results
+    }
+    json_output = jsonable_encoder(output)
+    return JSONResponse(content=json_output)
