@@ -1,0 +1,18 @@
+version: '3.5'
+services:
+  frontend:
+    container_name: arkham_bag_simulator_frontend
+    restart: always
+    build: ./frontend
+    ports: 
+        - 8080:80
+    # volumes:
+    #   - ./:/code
+    # stdin_open: true
+    # tty: true
+  backend:
+    container_name: arkham_bag_simulator_backend
+    restart: always
+    build: ./backend
+    ports: 
+        - 8000:80
