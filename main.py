@@ -1,7 +1,13 @@
 from typing import Optional, List
+from pydantic import BaseModel
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+
+from simulation import resolveToken
+from analysis import analyzeResults
 
 app = FastAPI()
 
@@ -16,29 +22,28 @@ app.add_middleware(
 
 class Token(BaseModel):
     label: str
-    effect: int
+    modifier: int
     limit: int
     draw_again: bool
     quantity: int
     variable: bool
-    autofail: bool
-    autosucceed: bool
+    automatic_failure: bool
+    automatic_success: bool
     symbol: bool
-    appliedModifiers: List[int]
 
 class cards(BaseModel):
-    Counterspell: false
-    'Ritual Candles': false
-    "Ritual Candles (second copy)": false
-    "Recall the Future": false
-    "Recall the Future (second copy)": false
-    Defiance: false
+    counterspell: bool
+    ritual_candles: bool
+    ritual_candles_second_copy: bool
+    recall_the_future: str
+    recall_the_future_second_copy: str
+    defiance: str
+    defiance_level_2: bool
 
 class Character(BaseModel):
     name: str
     effect: int
     autosucceed: bool
-
 
 @app.get("/")
 async def root():
@@ -46,5 +51,12 @@ async def root():
 
 
 @app.post("/simulate/")
-async def create_simulation(bag: List[Token], cards: Cards, character: Optional[Character]):
-    return "REEEEE"
+async def create_simulation(bag: List[Token], cards: cards, character: Optional[Character]):
+    results = []
+    for token in bag:
+        print("drawing token: " + token.label)
+        token_results = resolveToken(token, bag, cards, character)
+        results += token_results
+    test_results = analyzeResults(results)
+    json_test_results = jsonable_encoder(test_results)
+    return JSONResponse(content=json_test_results)
