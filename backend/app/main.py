@@ -40,12 +40,8 @@ class cards(BaseModel):
     recall_the_future: str
     recall_the_future_second_copy: str
     defiance: str
+    defiance_second_copy: str
     defiance_level_2: bool
-
-class Character(BaseModel):
-    name: str
-    effect: int
-    autosucceed: bool
 
 @app.get("/")
 async def root():
@@ -53,7 +49,7 @@ async def root():
 
 
 @app.post("/simulate/")
-async def create_simulation(bag: List[Token], cards: cards, character: Optional[Character]):
+async def create_simulation(bag: List[Token], cards: cards, character: Optional[str] = ''):
     results = []
     results = Parallel(n_jobs=6)(delayed(resolveToken)(token, bag, cards, character) for token in bag)
     flattened_results = [result for token_result in results for result in token_result]

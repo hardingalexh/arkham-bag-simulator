@@ -67,7 +67,7 @@ def resolveToken(token, bag, cards, character, result=None):
 # checks to see if the character is father mateo and the token is an auto-fail or elder sign
 # returns boolean
 def fatherMateoConstructor(character, token):
-    return character.name == "Father Mateo" and (token.label == "automatic_failure" or token.label == "Elder Sign")
+    return character == "Father Mateo" and (token.label == "automatic_failure" or token.label == "Elder Sign")
 
 # Check for copies of Recall The Future and apply their modifiers
 def recallTheFuture(token, cards, result):
@@ -98,9 +98,11 @@ def isTokenIgnored(token, cards, character):
     ignored = False
     if cards.defiance == token.label:
         ignored = True
+    if cards.defiance_second_copy == token.label:
+        ignored = True
     if cards.defiance_level_2 and token.symbol:
         ignored = True
-    if character.name == "Jim Culver" and token.label == "Skull":
+    if character == "Jim Culver" and token.label == "Skull":
         # technically this treats the modifier as 0, but they're mathematically the same
         ignored = True
     return ignored

@@ -76,7 +76,7 @@
                   <thead>
                     <th>Token</th>
                     <th>Quantity</th>
-                    <th>Effect</th>
+                    <th>Modifier</th>
                     <th>Other</th>
                   </thead>
                   <tbody>
@@ -97,33 +97,17 @@
               </section>
             </div>
             <footer class="card-footer">
-              <a @click="simulate" class="card-footer-item">Simulate</a>
+              <a @click="simulate" class="card-footer-item" v-if="!ready">Simulate</a>
+              <span v-else class="card-footer-item">Fix missing values in highlighted red above to enable simulation</span>
             </footer>
           </div>
         </div>
         <div class="column">
           <!-- Probability of Success Card -->
-          <div class="card chart">
-            <header class="card-header">
-              <p class="card-header-title">Probability of Success ({{iterations}} Iterations)</p>
-            </header>
-            <div class="card-content">
-              <div class="content">
-                <highcharts :options="successChartOptions" class="vh70"></highcharts>
-              </div>
-            </div>
-          </div>
+          <successChart :data="successProbabilities" :iterations="iterations" />
           <!-- Probability of Token Card -->
-          <div class="card chart">
-            <header class="card-header">
-              <p class="card-header-title">Probability of Resolving Token</p>
-            </header>
-            <div class="card-content">
-              <div class="content">
-                <highcharts :options="tokenChartOptions" class="vh70"></highcharts>
-              </div>
-            </div>
-          </div>
+          <tokenChart :data="tokenProbabilities" :iterations="iterations" :tokens="tokens"/>
+          
         </div>
       </div>
     </section>
@@ -165,12 +149,15 @@
               <strong>Automatically Fails</strong>
             </p>
             <p>
-              <strong>5.</strong> Choose a character from the
+              <strong>5.</strong> (Optionally) Choose a character from the
               <strong>Choose Character</strong> dropdown. This will set the effect of the Elder Sign token, as well as apply and specific effects for investigators like Jim Culver or Father Mateo. If the chosen character's elder sign ability is variable, you may need to manually specify their effect.
             </p>
             <p>
               <strong>6.</strong> Select the
               <strong>Card Effects</strong> tab to select any cards you may be using for this skill test.
+            </p>
+            <p>
+              <strong>7.</strong> Click the <strong>Simulate</strong> button and await your results!
             </p>
           </div>
         </section>
@@ -184,10 +171,11 @@
 
 <script>
 // higcharts
-import { Chart } from "highcharts-vue";
 // components
 import card from "./components/card";
 import tokenRow from "./components/tokenRow";
+import successChart from "./components/successChart";
+import tokenChart from "./components/tokenChart";
 // lookups
 import tokens from "./lookups/tokens";
 import characters from "./lookups/characters";
@@ -200,9 +188,10 @@ import cards from "./lookups/cards";
 export default {
   name: "app",
   components: {
-    highcharts: Chart,
     tokenRow: tokenRow,
-    card: card
+    card: card,
+    successChart: successChart,
+    tokenChart: tokenChart,
   },
   data() {
     return {
@@ -222,114 +211,6 @@ export default {
     };
   },
   computed: {
-    tokenChartOptions() {
-      return {
-        chart: {
-          height: 300
-        },
-        chartType: "column",
-        legend: {
-          enabled: false
-        },
-        credits: {
-          enabled: false
-        },
-        title: {
-          text: ""
-        },
-        xAxis: {
-          categories: this.tokens.map(token => token.label),
-          title: {
-            text: "Tokens"
-          },
-          type: "category"
-        },
-        yAxis: {
-          title: {
-            text: "Probability of Resolving (percent)"
-          },
-          max: 25,
-          min: 0,
-          type: "column"
-        },
-        series: [
-          {
-            data: this.tokenProbabilities,
-            color: "#00d1b2",
-            type: "column"
-          }
-        ],
-        plotOptions: {
-          column: {
-            dataLabels: {
-              enabled: true,
-              formatter: function() {
-                return String(parseFloat(this.y).toFixed(2)) + "%";
-              }
-              // style: {
-              //   color: "white",
-              //   textOutline: "0px"
-              // }
-            }
-          }
-        }
-      };
-    },
-    successChartOptions() {
-      return {
-        chartType: "line",
-        // chart: {
-        //   backgroundColor: "#363636"
-        // },
-        chart: {
-          height: 300
-        },
-        credits: {
-          enabled: false
-        },
-        title: {
-          text: ""
-        },
-        legend: {
-          enabled: false
-        },
-        yAxis: {
-          title: {
-            text: "Probability of success (percent)"
-            // style: {
-            //   color: "white"
-            // }
-          },
-          max: 100,
-          min: 0
-        },
-        xAxis: {
-          title: {
-            text: "Difference betweeen test difficulty and character skill"
-            // style: {
-            //   color: "white"
-            // }
-          },
-          type: "category",
-          categories: this.tests
-        },
-        plotOptions: {
-          line: {
-            dataLabels: {
-              enabled: true,
-              formatter: function() {
-                return this.x + ": " + this.y + "%";
-              }
-              // style: {
-              //   color: "white",
-              //   textOutline: "0px"
-              // }
-            }
-          }
-        },
-        series: [{ data: this.successProbabilities, color: "#00d1b2" }]
-      };
-    },
     bag() {
       let bag = [];
       Object.values(this.tokens).forEach(token => {
@@ -340,6 +221,16 @@ export default {
         }
       });
       return bag;
+    },
+    ready(){
+      let allTokensValid = true
+      this.bag.forEach(token =>{
+        if(isNaN(parseInt(token.modifier))){
+          allTokensValid = false
+        }
+      })
+
+      return !allTokensValid
     }
   },
   watch: {
@@ -348,21 +239,21 @@ export default {
         token => token.label == "Elder Sign"
       )[0];
       let character = this.characters[newIdx];
-      elderSign.effect = character.effect;
-      elderSign.autosucceed = character.autosucceed;
+      elderSign.modifier = character.effect;
+      elderSign.automatic_success = character.autosucceed;
     }
   },
   methods: {
     simulate() {
         fetch('http://localhost:8000/simulate/', {
           method: 'post',
-          body: JSON.stringify({bag: this.bag, cards: this.cards, character: this.characters[this.characterIdx]})
+          body: JSON.stringify({
+            bag: this.bag, 
+            cards: this.cards, 
+            character: this.characterIdx ? this.characters[this.characterIdx].name : null})
         })
         .then((r) => r.json())
         .then(function(d){
-          //eslint-disable-next-line
-          console.log(d)
-
           this.successProbabilities = Object.keys(d.test_results)
           .sort((a,b) => parseInt(a) - parseInt(b))
           .map(k => d.test_results[k])
@@ -372,19 +263,6 @@ export default {
           // eslint-disable-next-line
           console.error(e)
         })
-    },
-    probabilitiesOfToken() {
-      return []
-      // let probabilities = [];
-      // this.tokens.forEach(token => {
-      //   let probability = probabilityOfToken(
-      //     token,
-      //     this.bag,
-      //     this.characterIdx
-      //   );
-      //   probabilities.push(probability);
-      // });
-      // return probabilities;
     },
     setDefault(key) {
       let bag = bags[key];

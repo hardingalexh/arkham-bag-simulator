@@ -2,7 +2,7 @@
   <div>
     <div class="columns" v-if="symbols.includes(cardValue)">
       <div class="column is-6 has-text-right">
-        <label class="is-small">{{cardValue}}</label>
+        <label class="is-small">{{lookup[cardValue]}}</label>
       </div>
       <div class="column is-6">
         <div class="select is-fullwidth is-small is-expanded">
@@ -19,7 +19,7 @@
     </div>
     <div class="columns" v-else-if="any.includes(cardValue)">
         <div class="column is-6 has-text-right">
-          <label class="is-small">{{cardValue}}</label>
+          <label class="is-small">{{lookup[cardValue]}}</label>
         </div>
       <div class="column is-6">
         <div class="control">
@@ -38,7 +38,7 @@
     </div>
     <div class="columns" v-else>
       <div class="column is-6 has-text-right">
-        <label class="is-small">{{cardValue}}</label>
+        <label class="is-small">{{lookup[cardValue]}}</label>
       </div>
       <div class="column is-6">
         <div class="control">
@@ -49,13 +49,15 @@
   </div>
 </template>
 <script>
+import {cardLookup} from '../lookups/cards'
 export default {
   name: "card",
   props: ["cardKey", "cardValue", "cards", "tokens"],
   data() {
     return {
-      symbols: ["Defiance", "Defiance (second copy)"],
-      any: ["Recall the Future", "Recall the Future (second copy)"]
+      lookup: cardLookup,
+      symbols: ["defiance", "defiance_second_copy"],
+      any: ["recall_the_future", "recall_the_future_second_copy"]
     };
   },
   computed: {

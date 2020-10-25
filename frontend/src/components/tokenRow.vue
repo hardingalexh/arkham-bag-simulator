@@ -23,9 +23,9 @@
     <td>
       <div class="field">
         <div
-          :class="'select is-small is-fullwidth ' + (token.variable && token.effect === null && token.quantity > 0 ? 'is-danger' : '')"
+          :class="'select is-small is-fullwidth ' + (token.variable && token.modifier === null && token.quantity > 0 ? 'is-danger' : '')"
         >
-          <select v-model="token.effect" :disabled="!token.variable">
+          <select v-model="token.modifier" :disabled="!token.variable">
             <option value></option>
             <option value="10" v-if="token.label === 'Elder Sign'">+10</option>
             <option value="9" v-if="token.label === 'Elder Sign'">+9</option>

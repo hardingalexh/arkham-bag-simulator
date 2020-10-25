@@ -12,10 +12,10 @@ export default [
     new Token("-8", -8, 1),
     new Token("Blessing", 2, 10, { draw_again: true,  }),
     new Token("Curse", -2, 10, { draw_again: true }),
-    new Token("Skull", 0, 4, { variable: true, symbol: true }),
-    new Token("Cultist", 0, 4, { variable: true, symbol: true }),
-    new Token("Tablet", 0, 4, { variable: true, symbol: true }),
-    new Token("Elder Thing", 0, 4, { variable: true, symbol: true }),
+    new Token("Skull", null, 4, { variable: true, symbol: true }),
+    new Token("Cultist", null, 4, { variable: true, symbol: true }),
+    new Token("Tablet", null, 4, { variable: true, symbol: true }),
+    new Token("Elder Thing", null, 4, { variable: true, symbol: true }),
     new Token("Autofail", 0, 1, { automatic_failure: true }),
-    new Token("Elder Sign", 0, 1, { variable: true })
+    new Token("Elder Sign", null, 1, { variable: true })
 ]
