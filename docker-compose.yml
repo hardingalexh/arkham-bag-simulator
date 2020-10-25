@@ -13,6 +13,10 @@ services:
   backend:
     container_name: arkham_bag_simulator_backend
     restart: always
+    depends_on:
+      - db
+    links:
+      - db
     build: ./backend
     ports: 
         - 8000:80

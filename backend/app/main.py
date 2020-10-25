@@ -8,13 +8,13 @@ from fastapi.responses import JSONResponse
 
 from sqlalchemy.orm import Session
 
-from . import crud, models, schemas
-from .database import SessionLocal, engine
+import crud, models, schemas
+from database import SessionLocal, engine
 
 from joblib import Parallel, delayed
 
-from .simulation import resolveToken
-from .analysis import analyzeResults
+from simulation import resolveToken
+from analysis import analyzeResults
 
 models.Base.metadata.create_all(bind=engine)
 

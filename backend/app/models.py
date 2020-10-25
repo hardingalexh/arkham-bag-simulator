@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 
 import uuid
 
-from .database import Base
+from database import Base
 
 class Simulation(Base):
     __tablename__ = "simulations"
