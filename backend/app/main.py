@@ -43,17 +43,25 @@ async def root():
 
 
 @app.post("/simulate/")
-async def create_simulation(simulation: schemas.SimulationCreate, bag: List[schemas.Token], cards: schemas.Cards, character: Optional[str] = '', db: Session = Depends(get_db)):
-    db_simulation = crud.create_simulation(db, simulation)
-    results = []
-    results = Parallel(n_jobs=6)(delayed(resolveToken)(token, bag, cards, character) for token in bag)
-    flattened_results = [result for token_result in results for result in token_result]
+async def create_simulation(simulation: schemas.SimulationCreate, db: Session = Depends(get_db)):
+    # check to see if this simulation has been run before
+    cached_simulation_search = crud.find_cached_simulation(db, simulation)
 
-    test_results = analyzeResults(flattened_results)
-    output = {
-        'db_simulation': db_simulation,
-        'iterations': len(flattened_results),
-        'test_results': test_results
-    }
+    if cached_simulation_search is None:
+        # run simulation
+        # db_simulation = crud.create_simulation(db, simulation)
+        results = []
+        results = Parallel(n_jobs=6)(delayed(resolveToken)(token, simulation.bag, simulation.cards, simulation.character) for token in simulation.bag)
+        flattened_results = [result for token_result in results for result in token_result]
+        test_results = analyzeResults(flattened_results)
+        # write simulation to cache table
+        db_cached_simulation = crud.create_cached_simulation(db, simulation, len(flattened_results), test_results)
+        output = db_cached_simulation
+        output.status = "result"
+    else:
+        output = cached_simulation_search
+        output.status = "cached"
+    
+    # encode result as json and return
     json_output = jsonable_encoder(output)
     return JSONResponse(content=json_output)

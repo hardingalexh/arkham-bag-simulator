@@ -30,6 +30,9 @@ class Cards(BaseModel):
 class SimulationBase(BaseModel):
     status: str
     iterations: int
+    bag: List[Token]
+    cards: Cards
+    character: Optional[str]
 
 class SimulationCreate(SimulationBase):
     pass
@@ -42,9 +45,11 @@ class Simulation(SimulationBase):
 
 # Cached Simulation
 class CachedSimulationBase(BaseModel):
+    iterations: int
     bag: List[Token]
     cards: Cards
     character: Optional[str]
+    test_results: dict
 
 class CachedSimulationCreate(CachedSimulationBase):
     pass
