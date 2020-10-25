@@ -245,6 +245,7 @@ export default {
         fetch('http://localhost:8000/simulate/', {
           method: 'post',
           body: JSON.stringify({
+            simulation: {status: 'Pending', iterations: 0},
             bag: this.bag, 
             cards: this.cards, 
             character: this.characterIdx ? this.characters[this.characterIdx].name : null})

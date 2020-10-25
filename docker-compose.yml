@@ -16,3 +16,13 @@ services:
     build: ./backend
     ports: 
         - 8000:80
+  db:
+    image: postgres:11
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+  # queue:
+  #   image: rabbitmq:latest

@@ -1,2 +1,4 @@
 fastapi[all]
 joblib
+sqlalchemy
+psycopg2-binary
