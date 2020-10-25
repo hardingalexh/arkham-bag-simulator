@@ -104,7 +104,7 @@
         </div>
         <div class="column">
           <!-- Probability of Success Card -->
-          <successChart :data="successProbabilities" :iterations="iterations" />
+          <successChart :data="successProbabilities" :iterations="iterations" :tests="tests" />
           <!-- Probability of Token Card -->
           <tokenChart :data="tokenProbabilities" :iterations="iterations" :tokens="tokens"/>
           
@@ -254,6 +254,8 @@ export default {
         })
         .then((r) => r.json())
         .then(function(d){
+          //eslint-disable-next-line
+          console.log(d)
           this.successProbabilities = Object.keys(d.test_results)
           .sort((a,b) => parseInt(a) - parseInt(b))
           .map(k => d.test_results[k])

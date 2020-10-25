@@ -26,6 +26,10 @@ export default {
       iterations: {
           required: true,
           type: Number
+      },
+      tests: {
+        required: true,
+        type: Array
       }
   },
   computed: {
