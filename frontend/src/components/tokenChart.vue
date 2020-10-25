@@ -65,7 +65,7 @@ export default {
             },
             series: [
                 {
-                    data: this.tokenProbabilities,
+                    data: this.data,
                     color: "#00d1b2",
                     type: "column"
                 }

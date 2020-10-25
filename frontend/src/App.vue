@@ -181,9 +181,6 @@ import tokens from "./lookups/tokens";
 import characters from "./lookups/characters";
 import bags from "./lookups/bags";
 import cards from "./lookups/cards";
-// functions
-// import applyToken from "./functions/applyToken";
-// import probabilityOfToken from "./functions/probabilityOfToken";
 
 export default {
   name: "app",
@@ -254,12 +251,11 @@ export default {
         })
         .then((r) => r.json())
         .then(function(d){
-          //eslint-disable-next-line
-          console.log(d)
           this.successProbabilities = Object.keys(d.test_results)
           .sort((a,b) => parseInt(a) - parseInt(b))
           .map(k => d.test_results[k])
           this.iterations = d.iterations
+          this.tokenProbabilities = this.tokens.map(t => (this.bag.filter(bt => bt.label === t.label).length * 100) / this.bag.length)
         }.bind(this))
         .catch(e => {
           // eslint-disable-next-line

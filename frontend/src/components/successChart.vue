@@ -33,7 +33,7 @@ export default {
       }
   },
   computed: {
-      successChartOptions() {
+    successChartOptions() {
       return {
         chartType: "line",
         chart: {
@@ -74,7 +74,7 @@ export default {
         },
         series: [{ data: this.data, color: "#00d1b2" }]
       };
-    },
+    }
   }
 }
 </script>
