@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   frontend:
-    container_name: arkham_bag_simulator_frontend
+    container_name: abs_frontend
     restart: always
     build: 
         context: ./frontend
@@ -12,12 +12,14 @@ services:
       - ./frontend:/app
     command: ["npm", "run", "serve"]
   backend:
-    container_name: arkham_bag_simulator_backend
+    container_name: abs_backend
     restart: always
     depends_on:
       - db
+      - redis
     links:
       - db
+      - redis
     build: 
         context: ./backend
     ports: 
@@ -26,7 +28,10 @@ services:
       - ./backend/app:/app
     entrypoint:
       - /start-reload.sh
+    stdin_open: true
+    tty: true
   db:
+    container_name: abs_db
     image: postgres:11
     ports:
       - "5432:5432"
@@ -34,5 +39,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-  # queue:
-  #   image: rabbitmq:latest
+    volumes:
+        - adb_pg_db_dev:/var/lib/postgresql/data
+  redis:
+    container_name: abs_redis
+    image: redis:alpine
+volumes:
+  adb_pg_db_dev:
+  
