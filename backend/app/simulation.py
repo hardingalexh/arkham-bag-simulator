@@ -20,13 +20,13 @@ def resolveToken(token, bag, cards, character, result=None):
     # Token is automatic_failure
     if token.automatic_failure:
         if not fatherMateo:
-            result['tokens_resolved'].append(token.label)
+            result['tokens_resolved'].append(token)
             result['automatic_failure'] = True
             return [result]
     
     # Token is an automatic success
     if token.automatic_success or fatherMateo:
-        result['tokens_resolved'].append(token.label)
+        result['tokens_resolved'].append(token)
         result['automatic_success']: True
         return [result]
     
@@ -43,7 +43,7 @@ def resolveToken(token, bag, cards, character, result=None):
     result = ritualCandles(token, cards, result)
 
     if not isTokenIgnored(token, cards, character):
-        result['tokens_resolved'].append(token.label)
+        result['tokens_resolved'].append(token)
         result['modifier'] += token.modifier
     
     ###################################################################

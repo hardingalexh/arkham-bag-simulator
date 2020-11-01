@@ -213,7 +213,9 @@ export default {
       Object.values(this.tokens).forEach(token => {
         let i = 0;
         while (i < token.quantity) {
-          bag.push(token);
+          let tokenClone = {...token}
+          tokenClone.id = bag.length
+          bag.push(tokenClone);
           i++;
         }
       });

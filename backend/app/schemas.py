@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import uuid
 
 class Token(BaseModel):
+    id: int
     label: str
     modifier: int
     limit: int

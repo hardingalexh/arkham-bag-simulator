@@ -54,7 +54,7 @@ async def create_simulation(simulation: schemas.SimulationCreate, db: Session = 
         results = []
         results = Parallel(n_jobs=6)(delayed(resolveToken)(token, simulation.bag, simulation.cards, simulation.character) for token in simulation.bag)
         flattened_results = [result for token_result in results for result in token_result]
-        test_results = analyzeResults(flattened_results)
+        test_results = analyzeResults(flattened_results, simulation.bag)
         # write simulation to cache table
         db_cached_simulation = crud.create_cached_simulation(db, simulation, len(flattened_results), test_results)
         output = db_cached_simulation
